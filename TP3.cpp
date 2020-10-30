@@ -6,31 +6,35 @@ int main(){
     FILE *myfile;
     myfile = fopen ("exemplo.txt","r");
     int N, operacao;
-    char dado[32] = "";
+    char dado[32];
     int **cache, **memoria;
 
     cache = inicializaCache();
     memoria = inicializaMemoria();
 
-    // testando a cache - imprimindo os 7 primeiros bits
-    // for(int i = 0; i < 64; i++){
-    //     for(int j = 0; j < 7; j++)
-    //         cout<< cache[i][j];
-    //     cout << endl;
-    // }
-    // while( !feof(myfile) ){
-    //     fscanf(myfile, "%d %d", &N, &operacao);
-    //     cout << N << " " << operacao << " ";
-    //     // Se eh uma operação de escrita
-    //     if(operacao == 1){
-    //         fscanf(myfile, "%s", dado); // deixar armazenado como string msm ?
 
-    //         // escreverDado();
-    //         // cout << dado << endl;
-    //     }else{
-    //         // cout << endl;
-    //         // lerDado();
-    // }
+    while( !feof(myfile) ){
+        fscanf(myfile, "%d %d", &N, &operacao);
+        cout << N << " " << operacao << " " << endl;
+        // Se eh uma operação de escrita
+        if(operacao == 1){
+            fscanf(myfile, "%s", dado); // deixar armazenado como string msm ?
+
+            escreverDado(N, dado, cache);
+        }else{
+            // lerDado();
+        }
+    }
+    
+    // Visualiza a cache
+    for(int i = 0; i < 64; i++){
+        for(int j = 0; j < 161; j++){
+            cout<< cache[i][j];
+            if(j == 5 || j == 6 || j == 8 || j == 32 || j == 64 || j == 97 || j == 128)
+                cout << "|";
+        }
+        cout << endl;
+    }
 
     // libera a memória da cache e da memoria
     for (int i = 0; i < 64; i++)
