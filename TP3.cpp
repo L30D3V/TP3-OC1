@@ -19,7 +19,7 @@ int main(){
         // Se eh uma operação de escrita
         if(operacao == 1){
             fscanf(myfile, "%s", dado); // deixar armazenado como string msm ?
-
+            cout << dado << endl;
             escreverDado(N, dado, cache);
         }else{
             // lerDado();
@@ -27,13 +27,15 @@ int main(){
     }
     
     // Visualiza a cache
-    for(int i = 0; i < 64; i++){
-        for(int j = 0; j < 161; j++){
-            cout<< cache[i][j];
-            if(j == 5 || j == 6 || j == 8 || j == 32 || j == 64 || j == 97 || j == 128)
-                cout << "|";
-        }
+    for(int i = 0; i <= 64; i++){
+        if(cache[i][6] == 1){
+            for(int j = 0; j <= 161; j++){
+                cout<< cache[i][j];
+                if(j == 5 || j == 6 || j == 8 || j == 32 || j == 64 || j == 96 || j == 128)
+                    cout << "|";
+            }
         cout << endl;
+        }
     }
 
     // libera a memória da cache e da memoria
