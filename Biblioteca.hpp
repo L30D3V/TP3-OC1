@@ -14,16 +14,27 @@ int str_to_int(char string){
         return 0;
 }
 
-// Converte uma string (binário) em inteiro
-char bin_to_int(char *dado){
-    int offset;
-    // Pega as posições 24 e 25 e calcula o offset da palavra
-    if(dado[24] == '0'){
-        dado[25] == '0' ? offset = 0 : offset = 1;
-    }else{
-        dado[25] == '0' ? offset = 2 : offset = 3;
-    }
-    return offset;
+int getOffset(int endereco) {
+    bitset<2> bit_offset(endereco);
+    cout << "<< bit_offset: " << bit_offset << '\n';
+
+    return (int)(bit_offset.to_ulong());
+}
+
+int getIndex(int endereco) {
+    bitset<6> bit_index;
+    bitset<8> bit_endereco(endereco);
+
+    bit_index[0] = bit_endereco[2];
+    bit_index[1] = bit_endereco[3];
+    bit_index[2] = bit_endereco[4];
+    bit_index[3] = bit_endereco[5];
+    bit_index[4] = bit_endereco[6];
+    bit_index[5] = bit_endereco[7];
+
+    cout << "<< bit_endereco: " << bit_endereco << " | bit_index: " << bit_index << '\n';
+    
+    return (int)(bit_index.to_ulong());
 }
 
 /*************
@@ -70,25 +81,25 @@ int** inicializaMemoria(){
     return memoria;
 }
 
-void escreverDado(int endereco, char *dado, int **cache){
-    // Localização determinada pelo endereço --> (Endereço do bloco) mod (#Blocos na cache)
-    // Ex: 5 1 00000000000000000000000000000101
-    // 5 % 64 = 5
-    int localizacao, offset;
-    localizacao = endereco % 64;
-    offset = bin_to_int(dado);
+void escreverDado(int endereco, char *dado, int **cache) {
+    // Transformar endereço em binário
+    int offset = getOffset(endereco);
+    int index = getIndex(endereco);
+
+    cout << "<< endereço: " << endereco << " | dado: " << dado << endl;
+    cout << "<< index " << index << " | offset: " << offset << endl;
+    
     // ##### FALTA:
-    // Checar se o bloco está vazio -  e se o bloco estiver cheio mas os outros estiverem vazios? armazeno nos outros ou mando pra memória?
+    // Checar se o bloco está vazio
     // Salvar a TAG
     // Alterar o bit de validade
-    
-    // armazena o dado de acordo com o offset
-    // se offset = 0, armazena na cache de 33 a 65, se offset = 1, armazena na cache de 66 a 98, etc
-    for(int j = 33*(offset+1), i = 0; j < (33+32*(offset+1)); i++, j++)
-        cache[localizacao][j] = str_to_int(dado[i]);
-    
-    // #### Testando
-    // for(int j = 33*(offset+1); j < (33+32*(offset+1)); j++)
-    //     cout << cache[localizacao][j];
-    // cout << endl;
+
+    // Marca bit_v como 1
+    int bit_v = offset*55;
+    cache[index][bit_v] = 1;
+    // Armazena dado
+    for (int i = 0; i < 32; i++) {
+        int pos_i = 55*offset + 23 + i;
+        cache[index][pos_i] = str_to_int(dado[i]);
+    }
 }

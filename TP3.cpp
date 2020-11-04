@@ -12,27 +12,25 @@ int main() {
     cache = inicializaCache();
     memoria = inicializaMemoria();
 
-
     while (!feof(myfile)) {
         fscanf(myfile, "%d %d", &N, &operacao);
         cout << N << " " << operacao << " " << endl;
         // Se eh uma operação de escrita
-        if(operacao == 1){
-            fscanf(myfile, "%s", dado); // deixar armazenado como string msm ?
-
+        if(operacao == 1) {
+            fscanf(myfile, "%s", dado);
             escreverDado(N, dado, cache);
-        }else{
+        } else {
             // lerDado();
         }
     }
     
     // Visualiza a cache
-    for(int i = 0; i < 64; i++) {
+    for (int i = 0; i < 64; i++) {
         cout << ">> " << i << " ";
 
-        for(int j = 0; j < 161; j++){
+        for (int j = 0; j < 220; j++) {
             cout << cache[i][j];
-            if(j == 0 || j == 22 || j == 54 || j == 55 || j == 77 || j == 109 || j == 110 || j == 132 || j == 164 || j == 165 || j == 187)
+            if (j == 0 || j == 22 || j == 54 || j == 55 || j == 77 || j == 109 || j == 110 || j == 132 || j == 164 || j == 165 || j == 187)
                 cout << "|";
         }
         cout << endl;
