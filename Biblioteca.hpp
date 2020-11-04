@@ -57,10 +57,10 @@ string getTag(int endereco) {
 // - 16 bytes p/ bloco - 128 bits
 // - 4 palavras de 32 bits (4 bytes) por bloco
 // - Cache = [ bit_v + tag + palavra |  bit_v + tag + palavra | bit_v + tag + palavra | bit_v + tag + palavra ]
-// - 57 bits por palavra = 220 bits no total
+// - 57 bits por palavra = 228 bits no total
 int** inicializaCache(){
     // Matriz "cache" está na seguinte ordem:
-    // 1 bit de validade, 22 bits de Tag, 32 bits para palavra
+    // 1 bit de validade, 24 bits de Tag, 32 bits para palavra
     // [0]   -> bit_v1; [1-24]    -> tag_1; [25-56]   -> palavra_1
     // [57]  -> bit_v2; [57-79]   -> tag_2; [80-111]  -> palavra_2
     // [112] -> bit_v3; [113-134] -> tag_3; [135-166] -> palavra_3
@@ -122,6 +122,6 @@ void escreverDado(int endereco, char *dado, int **cache) {
         }
     } else {
         // Implementa write back na memória e sobrescrita em cache
-        cout << ">> Endereço já ocupado em cache: " << index << endl;
+        cout << ">> Endereco ja ocupado em cache: " << index << endl;
     }
 }
