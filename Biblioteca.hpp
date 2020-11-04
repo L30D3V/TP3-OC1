@@ -101,25 +101,27 @@ void escreverDado(int endereco, char *dado, int **cache) {
 
     cout << "<< endereço: " << endereco << " | dado: " << dado << endl;
     cout << "<< index " << index << " | offset: " << offset << endl;
-    
-    // ##### FALTA:
-    // Checar se o bloco está vazio
-    // Salvar a TAG
-    // Alterar o bit de validade
 
-    // Marca bit_v como 1
     int bit_v = offset*55;
-    cache[index][bit_v] = 1;
     
-    // Armazena dado
-    for (int i = 0; i < 32; i++) {
-        int pos_i = 55*offset + 23 + i;
-        cache[index][pos_i] = str_to_int(dado[i]);
-    }
+    // Verifica se bloco em cache já está sendo utilizado
+    if (cache[index][bit_v] != 1) {
+        // Marca bit_v como 1
+        cache[index][bit_v] = 1;
+        
+        // Armazena dado
+        for (int i = 0; i < 32; i++) {
+            int pos_i = 55*offset + 23 + i;
+            cache[index][pos_i] = str_to_int(dado[i]);
+        }
 
-    // Armazena Tag
-    for (int i = 0; i < 24; i++) {
-        int pos_i = 55*offset + 1 + i;
-        cache[index][pos_i] = str_to_int(tag[i]);
+        // Armazena Tag
+        for (int i = 0; i < 24; i++) {
+            int pos_i = 55*offset + 1 + i;
+            cache[index][pos_i] = str_to_int(tag[i]);
+        }
+    } else {
+        // Implementa write back na memória e sobrescrita em cache
+        cout << ">> Endereço já ocupado em cache: " << index << endl;
     }
 }
