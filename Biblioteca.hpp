@@ -1,9 +1,11 @@
 #include <iostream>
 #include <bitset>
 using namespace std;
-/* 
-######### Começo funções auxiliares
-*/
+
+/************** 
+###### Começo funções auxiliares ######
+*************/
+
 // Converte uma string em inteiro
 int str_to_int(char string){
     if(string == '1')
@@ -11,51 +13,46 @@ int str_to_int(char string){
     else
         return 0;
 }
+
 // Converte uma string (binário) em inteiro
-char bin_to_int(string bin){
+char bin_to_int(char *dado){
     int offset;
-    // Pega as posições 30 e 31 e calcula o offset da palavra
-    if(bin[30] == '0'){
-        bin[31] == '0' ? offset = 0 : offset = 1;
+    // Pega as posições 24 e 25 e calcula o offset da palavra
+    if(dado[24] == '0'){
+        dado[25] == '0' ? offset = 0 : offset = 1;
     }else{
-        bin[31] == '0' ? offset = 2 : offset = 3;
+        dado[25] == '0' ? offset = 2 : offset = 3;
     }
     return offset;
 }
-/* 
-######### Fim funções auxiliares
-*/
+
+/*************
+###### Fim funções auxiliares ######
+*************/
 
 // Memória cache - 64 blocos
 // - 16 bytes p/ bloco - 128 bits
-// - 4 palavras de 32 bits (4bytes) p/ bloco
-//   - ou seja, em cada bloco cabem 4 palavras - precisamos criar um offset então
+// - 4 palavras de 32 bits (4 bytes) por bloco
+// - Cache = [ bit_v + tag + palavra |  bit_v + tag + palavra | bit_v + tag + palavra | bit_v + tag + palavra ]
+// - 55 bits por palavra = 220 bits no total
 int** inicializaCache(){
     // Matriz "cache" está na seguinte ordem:
-    // Índice seriam 6 bits (0 a 5), 1 bit de validade (6), Offset seriam 2 bits (7 e 8),
-    // Tag seria o restante: 32 - 6 - 2 = 24 bits (9 a 32) e
-    // 128 bits das palavras (33 a 161)
+    // 1 bit de validade, 22 bits de Tag, 32 bits para palavra
+    // [0]   -> bit_v1; [1-22]    -> tag_1; [23-54]   -> palavra_1
+    // [55]  -> bit_v2; [56-77]   -> tag_2; [78-109]  -> palavra_2
+    // [110] -> bit_v3; [111-132] -> tag_3; [133-164] -> palavra_3
+    // [165] -> bit_v4; [166-187] -> tag_4; [188-219] -> palavra_3
 
-    int **cache; // cache[64][161]; // 161 = largura = 6 + 1 + 24 + 2 + 128
+    int **cache; // cache[64][220]; // 220 = largura = 4 * (1 + 22 + 32)
     cache = (int**) malloc(64 * sizeof(int*));
     for(int i = 0; i < 64; i++)
-        cache[i] = (int*) malloc(161 * sizeof(int));
+        cache[i] = (int*) malloc(220 * sizeof(int));
 
-    string indice_binario;
-    for(int i = 0; i < 64; i++){
-        cache[i][6] = 0; // zera o bit de validade
-        indice_binario = bitset<6>(i).to_string(); // converte p/ binário
-
-        // escreve os bits de índice na cache
-        for(int bin_index = 0; bin_index <= 5; bin_index++)
-            cache[i][bin_index] = str_to_int(indice_binario[bin_index]);
-
-        // ### Temporário, Zerando as outras posições da cache
-        // ### p/ visualizar modificações na cache
-        // ### senão aparece lixo nas posições da cache
-        for(int j = 7; j < 162; j++)
+    // Limpar memória cache
+    for (int i = 0; i < 64; i++) {
+        for (int j = 0; j < 220; j++) {
             cache[i][j] = 0;
-        // ### Temporário, para visualizar modificações na cache
+        }
     }
 
     return cache;
@@ -75,48 +72,23 @@ int** inicializaMemoria(){
 
 void escreverDado(int endereco, char *dado, int **cache){
     // Localização determinada pelo endereço --> (Endereço do bloco) mod (#Blocos na cache)
+    // Ex: 5 1 00000000000000000000000000000101
+    // 5 % 64 = 5
     int localizacao, offset;
     localizacao = endereco % 64;
-    string endereco_extendido = bitset<32>(endereco).to_string(); // converte o endereço p/ binário e extende p/ 32 bits
-    // Offset vai ser os 2 últimos bits do endereço
-    offset = bin_to_int(endereco_extendido);
-    // cout << endereco_extendido<< ":::";
-    // cout<<"offset: "<<offset<<endl;
-    // Checar se o bloco está vazio
-    if(cache[localizacao][6] == 0){ // se o bloco está vazio
-        cache[localizacao][6] = 1; // coloca o bit válido
-        
-        // escreve os bits da tag na cache
-        for(int bin_index = 9, i = 0; bin_index <= 32; i++, bin_index++)
-            cache[localizacao][bin_index] = str_to_int(endereco_extendido[i]);
-
-        // escreve os bits do offset na cache
-        for(int bin_index = 7, i = 30; bin_index <= 8; i++, bin_index++)
-            cache[localizacao][bin_index] = str_to_int(endereco_extendido[i]);
-
-        // armazena o dado de acordo com o offset
-        // se offset = 0, armazena na cache de 33 a 65, se offset = 1, armazena na cache de 66 a 97, etc
-        for(int j = 33*(offset+1), i = 0; i <= 31; j++, i++)
-            cache[localizacao][j] = str_to_int(dado[i]);
-    }else{
-        // Se o bloco está cheio, faça...
-        // Pode ocorrer q o dado buscado seja armazenado em uma posição na cache que já tenha outro dado lá,
-        // então teria q atualizar a cache
-    }
-
+    offset = bin_to_int(dado);
+    // ##### FALTA:
+    // Checar se o bloco está vazio -  e se o bloco estiver cheio mas os outros estiverem vazios? armazeno nos outros ou mando pra memória?
+    // Salvar a TAG
+    // Alterar o bit de validade
+    
+    // armazena o dado de acordo com o offset
+    // se offset = 0, armazena na cache de 33 a 65, se offset = 1, armazena na cache de 66 a 98, etc
+    for(int j = 33*(offset+1), i = 0; j < (33+32*(offset+1)); i++, j++)
+        cache[localizacao][j] = str_to_int(dado[i]);
+    
     // #### Testando
-    // for(int j = 33*(offset+1); j < (33*(offset+1)+32); j++)
+    // for(int j = 33*(offset+1); j < (33+32*(offset+1)); j++)
     //     cout << cache[localizacao][j];
     // cout << endl;
 }
-
-// Operações de leitura enviam um endereço que desejam acessar,
-// esse endereço é passado para a cache que retorna o dado caso um hit ocorra,
-// ou busca um bloco na memória de dados caso um miss ocorra.
-
-/*
-Um dado na cache, também mapearia para a memória.
-Alguns dados da memória vão mapear para o mesmo endereço na cache
-*/
-
-// lerDado();
