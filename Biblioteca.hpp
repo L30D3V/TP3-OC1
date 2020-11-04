@@ -37,6 +37,18 @@ int getIndex(int endereco) {
     return (int)(bit_index.to_ulong());
 }
 
+string getTag(int endereco) {
+    bitset<24> bit_tag;
+    bitset<32> bit_endereco(endereco);
+    
+    for (int i = 0; i < 24; i++) {
+        bit_tag[i] = bit_endereco[i+8];
+    }
+
+    cout << "<< bit_endereco: " << bit_endereco << " | bit_tag: " << bit_tag << endl;
+    return bit_tag.to_string();
+}
+
 /*************
 ###### Fim funções auxiliares ######
 *************/
@@ -85,6 +97,7 @@ void escreverDado(int endereco, char *dado, int **cache) {
     // Transformar endereço em binário
     int offset = getOffset(endereco);
     int index = getIndex(endereco);
+    string tag = getTag(endereco);
 
     cout << "<< endereço: " << endereco << " | dado: " << dado << endl;
     cout << "<< index " << index << " | offset: " << offset << endl;
@@ -97,9 +110,16 @@ void escreverDado(int endereco, char *dado, int **cache) {
     // Marca bit_v como 1
     int bit_v = offset*55;
     cache[index][bit_v] = 1;
+    
     // Armazena dado
     for (int i = 0; i < 32; i++) {
         int pos_i = 55*offset + 23 + i;
         cache[index][pos_i] = str_to_int(dado[i]);
+    }
+
+    // Armazena Tag
+    for (int i = 0; i < 24; i++) {
+        int pos_i = 55*offset + 1 + i;
+        cache[index][pos_i] = str_to_int(tag[i]);
     }
 }
