@@ -16,7 +16,7 @@ int str_to_int(char string){
 
 int getOffset(int endereco) {
     bitset<2> bit_offset(endereco);
-    cout << "<< bit_offset: " << bit_offset << '\n';
+    // cout << "<< bit_offset: " << bit_offset << '\n';
 
     return (int)(bit_offset.to_ulong());
 }
@@ -32,7 +32,7 @@ int getIndex(int endereco) {
     bit_index[4] = bit_endereco[6];
     bit_index[5] = bit_endereco[7];
 
-    cout << "<< bit_endereco: " << bit_endereco << " | bit_index: " << bit_index << '\n';
+    // cout << "<< bit_endereco: " << bit_endereco << " | bit_index: " << bit_index << '\n';
     
     return (int)(bit_index.to_ulong());
 }
@@ -45,7 +45,7 @@ string getTag(int endereco) {
         bit_tag[i] = bit_endereco[i+8];
     }
 
-    cout << "<< bit_endereco: " << bit_endereco << " | bit_tag: " << bit_tag << endl;
+    // cout << "<< bit_endereco: " << bit_endereco << " | bit_tag: " << bit_tag << endl;
     return bit_tag.to_string();
 }
 
@@ -57,23 +57,23 @@ string getTag(int endereco) {
 // - 16 bytes p/ bloco - 128 bits
 // - 4 palavras de 32 bits (4 bytes) por bloco
 // - Cache = [ bit_v + tag + palavra |  bit_v + tag + palavra | bit_v + tag + palavra | bit_v + tag + palavra ]
-// - 55 bits por palavra = 220 bits no total
+// - 57 bits por palavra = 220 bits no total
 int** inicializaCache(){
     // Matriz "cache" está na seguinte ordem:
     // 1 bit de validade, 22 bits de Tag, 32 bits para palavra
-    // [0]   -> bit_v1; [1-22]    -> tag_1; [23-54]   -> palavra_1
-    // [55]  -> bit_v2; [56-77]   -> tag_2; [78-109]  -> palavra_2
-    // [110] -> bit_v3; [111-132] -> tag_3; [133-164] -> palavra_3
-    // [165] -> bit_v4; [166-187] -> tag_4; [188-219] -> palavra_3
+    // [0]   -> bit_v1; [1-24]    -> tag_1; [25-56]   -> palavra_1
+    // [57]  -> bit_v2; [57-79]   -> tag_2; [80-111]  -> palavra_2
+    // [112] -> bit_v3; [113-134] -> tag_3; [135-166] -> palavra_3
+    // [167] -> bit_v4; [168-189] -> tag_4; [190-221] -> palavra_3
 
-    int **cache; // cache[64][220]; // 220 = largura = 4 * (1 + 22 + 32)
+    int **cache; // cache[64][228]; // 228 = largura = 4 * (1 + 24 + 32)
     cache = (int**) malloc(64 * sizeof(int*));
     for(int i = 0; i < 64; i++)
-        cache[i] = (int*) malloc(220 * sizeof(int));
+        cache[i] = (int*) malloc(228 * sizeof(int));
 
     // Limpar memória cache
     for (int i = 0; i < 64; i++) {
-        for (int j = 0; j < 220; j++) {
+        for (int j = 0; j < 228; j++) {
             cache[i][j] = 0;
         }
     }
@@ -99,27 +99,25 @@ void escreverDado(int endereco, char *dado, int **cache) {
     int index = getIndex(endereco);
     string tag = getTag(endereco);
 
-    cout << "<< endereço: " << endereco << " | dado: " << dado << endl;
+    // cout << "<< endereço: " << endereco << " | dado: " << dado << endl;
     cout << "<< index " << index << " | offset: " << offset << endl;
     
     // ##### FALTA:
     // Checar se o bloco está vazio
-    // Salvar a TAG
-    // Alterar o bit de validade
 
     // Marca bit_v como 1
-    int bit_v = offset*55;
+    int bit_v = offset*57;
     cache[index][bit_v] = 1;
     
     // Armazena dado
     for (int i = 0; i < 32; i++) {
-        int pos_i = 55*offset + 23 + i;
+        int pos_i = 57*offset + 25 + i;
         cache[index][pos_i] = str_to_int(dado[i]);
     }
 
     // Armazena Tag
     for (int i = 0; i < 24; i++) {
-        int pos_i = 55*offset + 1 + i;
+        int pos_i = 57*offset + 1 + i;
         cache[index][pos_i] = str_to_int(tag[i]);
     }
 }
