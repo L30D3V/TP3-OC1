@@ -1,6 +1,4 @@
 #include "Biblioteca.hpp"
-// # Implementar - Hierarquia de memória
-// - Ler um arquivo, decodificar a requisição da CPU, realizar a operação e retornar um txt com alguns dados simples
 
 int main() {
     FILE *myfile;
@@ -26,11 +24,11 @@ int main() {
     
     // Visualiza a cache
     for (int i = 0; i < 64; i++) {
-        cout << ">> " << i << " ";
+        cout << ">> " << i << " |";
 
         for (int j = 0; j < 220; j++) {
             cout << cache[i][j];
-            if (j == 0 || j == 22 || j == 54 || j == 55 || j == 77 || j == 109 || j == 110 || j == 132 || j == 164 || j == 165 || j == 187)
+            if (j == 0 || j == 24 || j == 56 || j == 57 || j == 79 || j == 111 || j == 112 || j == 134 || j == 166 || j == 167 || j == 189)
                 cout << "|";
         }
         cout << endl;
