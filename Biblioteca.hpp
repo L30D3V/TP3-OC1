@@ -57,10 +57,10 @@ string getTag(int endereco) {
 // - 16 bytes p/ bloco - 128 bits
 // - 4 palavras de 32 bits (4 bytes) por bloco
 // - Cache = [ bit_v + tag + palavra |  bit_v + tag + palavra | bit_v + tag + palavra | bit_v + tag + palavra ]
-// - 57 bits por palavra = 220 bits no total
+// - 57 bits por palavra = 228 bits no total
 int** inicializaCache(){
     // Matriz "cache" está na seguinte ordem:
-    // 1 bit de validade, 22 bits de Tag, 32 bits para palavra
+    // 1 bit de validade, 24 bits de Tag, 32 bits para palavra
     // [0]   -> bit_v1; [1-24]    -> tag_1; [25-56]   -> palavra_1
     // [57]  -> bit_v2; [57-79]   -> tag_2; [80-111]  -> palavra_2
     // [112] -> bit_v3; [113-134] -> tag_3; [135-166] -> palavra_3
@@ -102,22 +102,26 @@ void escreverDado(int endereco, char *dado, int **cache) {
     // cout << "<< endereço: " << endereco << " | dado: " << dado << endl;
     cout << "<< index " << index << " | offset: " << offset << endl;
     
-    // ##### FALTA:
-    // Checar se o bloco está vazio
-
-    // Marca bit_v como 1
     int bit_v = offset*57;
-    cache[index][bit_v] = 1;
-    
-    // Armazena dado
-    for (int i = 0; i < 32; i++) {
-        int pos_i = 57*offset + 25 + i;
-        cache[index][pos_i] = str_to_int(dado[i]);
-    }
+    // se não tem palavra na seção do bloco da cache, faça:
+    if(cache[index][bit_v] == 0){
+        // Marca bit_v como 1
+        cache[index][bit_v] = 1;
+        
+        // Armazena dado
+        for (int i = 0; i < 32; i++) {
+            int pos_i = 57*offset + 25 + i;
+            cache[index][pos_i] = str_to_int(dado[i]);
+        }
 
-    // Armazena Tag
-    for (int i = 0; i < 24; i++) {
-        int pos_i = 57*offset + 1 + i;
-        cache[index][pos_i] = str_to_int(tag[i]);
+        // Armazena Tag
+        for (int i = 0; i < 24; i++) {
+            int pos_i = 57*offset + 1 + i;
+            cache[index][pos_i] = str_to_int(tag[i]);
+        }
+    }else{ // tem dado na cache, passe o dado da cache p/ memória de dados e coloque o novo dado na cache
+        // ##### FALTA:
+        // implementar caso em que há dado na cache
+        
     }
 }

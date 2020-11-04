@@ -1,5 +1,5 @@
 #include "Biblioteca.hpp"
-
+ 
 int main() {
     FILE *myfile;
     myfile = fopen ("exemplo.txt","r");
@@ -26,9 +26,9 @@ int main() {
     for (int i = 0; i < 64; i++) {
         cout << ">> " << i << " |";
 
-        for (int j = 0; j < 220; j++) {
+        for (int j = 0; j < 228; j++) {
             cout << cache[i][j];
-            if (j == 0 || j == 24 || j == 56 || j == 57 || j == 79 || j == 111 || j == 112 || j == 134 || j == 166 || j == 167 || j == 189)
+            if (j == 0 || j == 24 || j == 56 || j == 57 || j == 81 || j == 113 || j == 114 || j == 138 || j == 170 || j == 171 || j == 195)
                 cout << "|";
         }
         cout << endl;
