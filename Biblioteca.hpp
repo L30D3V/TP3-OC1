@@ -1,6 +1,7 @@
 #include <iostream>
 #include <bitset>
 #include <vector>
+#include <math.h>
 using namespace std;
 
 /**************
@@ -46,8 +47,25 @@ string getTag(int endereco) {
         bit_tag[i] = bit_endereco[i+8];
     }
 
-    // cout << "<< bit_endereco: " << bit_endereco << " | bit_tag: " << bit_tag << endl;
+    cout << "<< bit_endereco: " << bit_endereco << " | bit_tag: " << bit_tag << endl;
     return bit_tag.to_string();
+}
+
+int* getDataFromCache(int** cache, int index, int offset) {
+    int pos_i = 57*offset + 25;
+    int pos_end = pos_i + 32;
+    int data[32];
+
+    int i = 0;
+    while (pos_i <= pos_end) {
+        // cout << "i: " << i << " | pos_i: " << pos_i << " | bit_tag: " << bit_tag[i] << endl;
+
+        data[31 - i] = cache[index][pos_i];
+        i++;
+        pos_i++;
+    }
+
+    return data;
 }
 
 string getTagFromCache(int **cache, int index, int offset) {
@@ -57,9 +75,9 @@ string getTagFromCache(int **cache, int index, int offset) {
 
     int i = 0;
     while (pos_i <= pos_end) {
-        cout << "i: " << i << " | pos_i: " << pos_i << " | bit_tag: " << bit_tag[i] << endl;
+        // cout << "i: " << i << " | pos_i: " << pos_i << " | bit_tag: " << bit_tag[i] << endl;
 
-        bit_tag[i] = cache[index][pos_i];
+        bit_tag[23 - i] = cache[index][pos_i];
         i++;
         pos_i++;
     }
@@ -111,7 +129,39 @@ int** inicializaMemoria(){
     return memoria;
 }
 
-void escreverDado(int endereco, char *dado, int **cache) {
+void printLinhaCache(int** cache, int index) {
+    for (int j = 0; j < 228; j++) {
+        cout << cache[index][j];
+        if (j == 0 || j == 24 || j == 56 || j == 57 || j == 81 || j == 113 || j == 114 || j == 138 || j == 170 || j == 171 || j == 195)
+            cout << "|";
+    }
+    cout << endl;
+}
+
+void escreverDadoMemoria(int endereco, int* dado, int** memoria) {
+    for(int i = 0; i < 32; i++) {
+        memoria[endereco][i] = dado[i];
+    }
+}
+
+void escreverDadoCache(int** cache, int index, string tag, int offset, char* dado) {
+    int bit_v = offset*57;
+    cache[index][bit_v] = 1;
+
+    // Armazena dado
+    for (int i = 0; i < 32; i++) {
+        int pos_i = 57*offset + 25 + i;
+        cache[index][pos_i] = str_to_int(dado[i]);
+    }
+
+    // Armazena Tag
+    for (int i = 0; i < 24; i++) {
+        int pos_i = 57*offset + 1 + i;
+        cache[index][pos_i] = str_to_int(tag[i]);
+    }
+}
+
+void escreverDado(int endereco, char *dado, int **cache, int **memoria) {
     // Transformar endereço em binário
     int offset = getOffset(endereco);
     int index = getIndex(endereco);
@@ -123,23 +173,22 @@ void escreverDado(int endereco, char *dado, int **cache) {
     int bit_v = offset*57;
     // se não tem palavra na seção do bloco da cache, faça:
     if(cache[index][bit_v] != 1){
-        // Marca bit_v como 1
-        cache[index][bit_v] = 1;
-
-        // Armazena dado
-        for (int i = 0; i < 32; i++) {
-            int pos_i = 57*offset + 25 + i;
-            cache[index][pos_i] = str_to_int(dado[i]);
-        }
-
-        // Armazena Tag
-        for (int i = 0; i < 24; i++) {
-            int pos_i = 57*offset + 1 + i;
-            cache[index][pos_i] = str_to_int(tag[i]);
-        }
-    } else {
-        // Implementa write back na memória e sobrescrita em cache
-        cout << ">> Endereco ja ocupado em cache: " << index << endl;
+        escreverDadoCache(cache, index, tag, offset, dado);
+    } else { // tem dado na cache, passe o dado da cache p/ memória de dados e coloque o novo dado na cache
+        cout << "Antes"<< endl;
+        printLinhaCache(cache, index);
+        int* dado_pra_memoria = getDataFromCache(cache, index, offset);
+        int tag_int = stoi(getTagFromCache(cache, index, offset), nullptr, 2) * pow(2, 8);
+        int endereco_dado_antigo = (index * 4) + offset + tag_int;
+        cout << "tag_int: " << tag_int << endl;
+        cout << "tag binary value: " << getTagFromCache(cache, index, offset) << endl;
+        cout << "offset: " << offset << endl;
+        cout << "index: " << index << endl;
+        cout << "endereco_dado_antigo: " << endereco_dado_antigo << endl;
+        escreverDadoMemoria(endereco_dado_antigo, dado_pra_memoria, memoria);
+        escreverDadoCache(cache, index, tag, offset, dado);
+        cout << "Depoirs "<< endl;
+        printLinhaCache(cache, index);
     }
 }
 
@@ -149,7 +198,7 @@ bool lerDado(int endereco, int **cache) {
     string tag = getTag(endereco);
 
     int bit_v = offset*57;
-    
+
     if (cache[index][bit_v] == 1) {
         // Has data
         if (tag == getTagFromCache(cache, index, offset)) {
