@@ -4,7 +4,7 @@ int main() {
     FILE *myfile;
     myfile = fopen ("exemplo.txt","r");
     int N, operacao;
-    char dado[32];
+    char dado[WORD_SIZE];
     int **cache, **memoria;
     int hit_count = 0, miss_count = 0;
 
@@ -42,11 +42,11 @@ int main() {
     cout << ">> Hits: " << hit_count << " | Miss: " << miss_count << endl;
 
     // Libera a memória da cache e da memoria
-    for (int i = 0; i < 64; i++)
+    for (int i = 0; i < CACHE_NUM_BLOCKS; i++)
         free(cache[i]);
     free(cache);
 
-    for (int i = 0; i < 1024; i++)
+    for (int i = 0; i < MEMORY_NUM_BLOCKS; i++)
         free(memoria[i]);
     free(memoria);
 
