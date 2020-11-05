@@ -2,7 +2,7 @@
 #include <bitset>
 using namespace std;
 
-/************** 
+/**************
 ###### Começo funções auxiliares ######
 *************/
 
@@ -33,14 +33,14 @@ int getIndex(int endereco) {
     bit_index[5] = bit_endereco[7];
 
     // cout << "<< bit_endereco: " << bit_endereco << " | bit_index: " << bit_index << '\n';
-    
+
     return (int)(bit_index.to_ulong());
 }
 
 string getTag(int endereco) {
     bitset<24> bit_tag;
     bitset<32> bit_endereco(endereco);
-    
+
     for (int i = 0; i < 24; i++) {
         bit_tag[i] = bit_endereco[i+8];
     }
@@ -101,13 +101,13 @@ void escreverDado(int endereco, char *dado, int **cache) {
 
     // cout << "<< endereço: " << endereco << " | dado: " << dado << endl;
     cout << "<< index " << index << " | offset: " << offset << endl;
-    
+
     int bit_v = offset*57;
     // se não tem palavra na seção do bloco da cache, faça:
-    if(cache[index][bit_v] == 0){
+    if(cache[index][bit_v] != 1){
         // Marca bit_v como 1
         cache[index][bit_v] = 1;
-        
+
         // Armazena dado
         for (int i = 0; i < 32; i++) {
             int pos_i = 57*offset + 25 + i;
@@ -119,9 +119,8 @@ void escreverDado(int endereco, char *dado, int **cache) {
             int pos_i = 57*offset + 1 + i;
             cache[index][pos_i] = str_to_int(tag[i]);
         }
-    }else{ // tem dado na cache, passe o dado da cache p/ memória de dados e coloque o novo dado na cache
-        // ##### FALTA:
-        // implementar caso em que há dado na cache
-        
+    } else {
+        // Implementa write back na memória e sobrescrita em cache
+        cout << ">> Endereco ja ocupado em cache: " << index << endl;
     }
 }
