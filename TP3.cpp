@@ -1,6 +1,14 @@
 #include "Biblioteca.hpp"
 #include <fstream>
 
+/*
+    A main executa as seguintes etapas:
+    - Inicializa a cache
+    - Inicializa a memória
+    - Lê cada linha do arquivo exemplo.txt
+    - Executa a operação de leitura ou escrita e calcula o número de hits e miss
+    - Por fim, exibe o relatório no arquivo results.txt
+*/
 int main() {
     FILE *myfile;
     myfile = fopen ("exemplo.txt","r");
@@ -20,7 +28,6 @@ int main() {
         string entry = "";
 
         fscanf(myfile, "%d %d\n", &N, &operacao);
-        cout << N << " " << operacao << " " << endl;
 
         entry = to_string(N) + " " + to_string(operacao);
         // Se eh uma operação de escrita
@@ -52,23 +59,10 @@ int main() {
         entries.push_back(entry);
     }
 
-    // Visualiza a cache
-    // for (int i = 0; i < 64; i++) {
-    //     cout << ">> " << i << " |";
-
-    //     for (int j = 0; j < 228; j++) {
-    //         cout << cache[i][j];
-    //         if (j == 0 || j == 24 || j == 56 || j == 57 || j == 81 || j == 113 || j == 114 || j == 138 || j == 170 || j == 171 || j == 195)
-    //             cout << "|";
-    //     }
-    //     cout << endl;
-    // }
-
-    // Visualiza hit e miss
-    cout << ">> Hits: " << hit_count << " | Miss: " << miss_count << endl;
-
     // Write to file
     ofstream outfile ("result.txt");
+    // dígito de precisão igual a especificação
+    outfile.precision(1);
 
     hit_rate = (float) hit_count / (float) total_reads;
     miss_rate = (float) miss_count / (float) total_reads;
@@ -77,8 +71,8 @@ int main() {
     outfile << "WRITES: " << to_string(total_writes) << endl;
     outfile << "HITS: " << to_string(hit_count) << endl;
     outfile << "MISSES: " << to_string(miss_count) << endl;
-    outfile << "HIT RATE: " << to_string(hit_rate) << endl;
-    outfile << "MISS RATE: " << to_string(miss_rate) << endl << endl;
+    outfile << "HIT RATE: " << fixed << hit_rate << endl;
+    outfile << "MISS RATE: " << fixed << miss_rate << endl << endl;
 
     for (int i = 0; i < entries.size(); i++) {
         outfile << entries[i] << endl;
