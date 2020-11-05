@@ -1,5 +1,6 @@
 #include <iostream>
 #include <bitset>
+#include <vector>
 using namespace std;
 
 /**************
@@ -49,6 +50,23 @@ string getTag(int endereco) {
     return bit_tag.to_string();
 }
 
+string getTagFromCache(int **cache, int index, int offset) {
+    int pos_i = offset*57 + 1;
+    int pos_end = pos_i + 24;
+    bitset<24> bit_tag;
+
+    int i = 0;
+    while (pos_i <= pos_end) {
+        cout << "i: " << i << " | pos_i: " << pos_i << " | bit_tag: " << bit_tag[i] << endl;
+
+        bit_tag[i] = cache[index][pos_i];
+        i++;
+        pos_i++;
+    }
+
+    return bit_tag.to_string();
+}
+
 /*************
 ###### Fim funções auxiliares ######
 *************/
@@ -62,7 +80,7 @@ int** inicializaCache(){
     // Matriz "cache" está na seguinte ordem:
     // 1 bit de validade, 24 bits de Tag, 32 bits para palavra
     // [0]   -> bit_v1; [1-24]    -> tag_1; [25-56]   -> palavra_1
-    // [57]  -> bit_v2; [57-79]   -> tag_2; [80-111]  -> palavra_2
+    // [57]  -> bit_v2; [58-]   -> tag_2; [80-111]  -> palavra_2
     // [112] -> bit_v3; [113-134] -> tag_3; [135-166] -> palavra_3
     // [167] -> bit_v4; [168-189] -> tag_4; [190-221] -> palavra_3
 
@@ -122,5 +140,27 @@ void escreverDado(int endereco, char *dado, int **cache) {
     } else {
         // Implementa write back na memória e sobrescrita em cache
         cout << ">> Endereco ja ocupado em cache: " << index << endl;
+    }
+}
+
+bool lerDado(int endereco, int **cache) {
+    int offset = getOffset(endereco);
+    int index = getIndex(endereco);
+    string tag = getTag(endereco);
+
+    int bit_v = offset*57;
+    
+    if (cache[index][bit_v] == 1) {
+        // Has data
+        if (tag == getTagFromCache(cache, index, offset)) {
+            // Got a hit
+            return true;
+        } else {
+            // Miss
+            return false;
+        }
+    } else {
+        // Miss
+        return false;
     }
 }

@@ -6,6 +6,7 @@ int main() {
     int N, operacao;
     char dado[32];
     int **cache, **memoria;
+    int hit_count = 0, miss_count = 0;
 
     cache = inicializaCache();
     memoria = inicializaMemoria();
@@ -18,7 +19,10 @@ int main() {
             fscanf(myfile, "%s", dado);
             escreverDado(N, dado, cache);
         } else {
-            // lerDado();
+            if (lerDado(N, cache))
+                hit_count++;
+            else
+                miss_count++;
         }
     }
     
@@ -33,6 +37,9 @@ int main() {
         }
         cout << endl;
     }
+
+    // Visualiza hit e miss
+    cout << ">> Hits: " << hit_count << " | Miss: " << miss_count << endl;
 
     // Libera a memória da cache e da memoria
     for (int i = 0; i < 64; i++)
