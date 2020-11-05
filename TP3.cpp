@@ -19,7 +19,7 @@ int main() {
     while (!feof(myfile)) {
         string entry = "";
 
-        fscanf(myfile, "%d %d", &N, &operacao);
+        fscanf(myfile, "%d %d\n", &N, &operacao);
         cout << N << " " << operacao << " " << endl;
 
         entry = to_string(N) + " " + to_string(operacao);
@@ -29,9 +29,9 @@ int main() {
             total_writes++;
 
             fscanf(myfile, "%s", dado);
-            
-            for (int i = 0; i < 32; i++) { 
-                entry = entry + dado[i]; 
+
+            for (int i = 0; i < 32; i++) {
+                entry = entry + dado[i];
             }
 
             entry = entry + " W";
