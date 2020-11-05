@@ -67,7 +67,7 @@ string getTag(int endereco) {
 int* getDataFromCache(int** cache, int index, int offset) {
     int pos_i = CACHE_BLOCK_PARTITION_SIZE*offset + TAG_SIZE + BIT_V_SIZE;
     int pos_end = pos_i + WORD_SIZE;
-    int data[WORD_SIZE];
+    int *data = (int*) malloc(WORD_SIZE * sizeof(int));
 
     int i = 0;
     while (pos_i <= pos_end) {
